@@ -20,7 +20,8 @@
                [disableClose]="sidenavOpened"
                (click)="sidenavClicked()"
                [mode]="sidenavMode"
-               [opened]="sidenavOpened && !forceFullscreen">
+               [opened]="sidenavOpened && !forceFullscreen"
+               [style]="showLeftMenu?{display: 'none'}:{}">
     <header class="tb-nav-header">
       <mat-toolbar color="primary" class="tb-nav-header-toolbar">
         <div fxFlex="auto" fxLayout="row">
@@ -52,7 +53,7 @@
           <mat-icon class="material-icons">arrow_back</mat-icon>
         </button>
         <tb-breadcrumb [fxShow]="!displaySearchMode()"
-             fxFlex class="mat-toolbar-tools">
+                       fxFlex class="mat-toolbar-tools">
         </tb-breadcrumb>
         <div [fxShow]="displaySearchMode()" fxFlex fxLayout="row" class="tb-dark">
           <mat-form-field fxFlex class="tb-appearance-transparent">

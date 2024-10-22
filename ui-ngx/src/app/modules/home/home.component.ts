@@ -16,13 +16,13 @@
 
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { skip, startWith, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import {select, Store} from '@ngrx/store';
+import {debounceTime, distinctUntilChanged, map, takeUntil} from 'rxjs/operators';
 
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { PageComponent } from '@shared/components/page.component';
 import { AppState } from '@core/core.state';
-import { getCurrentAuthState } from '@core/auth/auth.selectors';
+import {getCurrentAuthState, selectAuthUser, selectUserDetails} from '@core/auth/auth.selectors';
 import { MediaBreakpoints } from '@shared/models/constants';
 import screenfull from 'screenfull';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -32,8 +32,9 @@ import { instanceOfSearchableComponent, ISearchableComponent } from '@home/model
 import { ActiveComponentService } from '@core/services/active-component.service';
 import { RouterTabsComponent } from '@home/components/router-tabs.component';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { isDefined, isDefinedAndNotNull } from '@core/utils';
+import {Authority} from "@shared/models/authority.enum";
 
 @Component({
   selector: 'tb-home',
@@ -68,13 +69,26 @@ export class HomeComponent extends PageComponent implements AfterViewInit, OnIni
   hideLoadingBar = false;
 
   private destroy$ = new Subject<void>();
+  private _authority!: string;
+  protected showLeftMenu: boolean;
 
   constructor(protected store: Store<AppState>,
               @Inject(WINDOW) private window: Window,
               private activeComponentService: ActiveComponentService,
               private fb: FormBuilder,
-              public breakpointObserver: BreakpointObserver) {
+              public breakpointObserver: BreakpointObserver,
+              private router: Router) {
     super(store);
+    this.store.pipe(
+      select(selectUserDetails),
+      map(user=>{
+        this._authority=user.authority;
+        this.showLeftMenu = this._authority!==undefined&&this._authority===Authority.CUSTOMER_USER;
+        if(this.showLeftMenu){
+          this.router.navigateByUrl('dashboards').then(()=>{});
+        }
+      })
+    ).subscribe();
   }
 
   ngOnInit() {
@@ -195,4 +209,7 @@ export class HomeComponent extends PageComponent implements AfterViewInit, OnIni
       this.searchableComponent.onSearchTextUpdated(searchText);
     }
   }
+
+  protected readonly localStorage = localStorage;
+  protected readonly Authority = Authority;
 }
