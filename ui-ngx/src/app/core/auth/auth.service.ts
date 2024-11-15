@@ -276,8 +276,10 @@ export class AuthService {
           this.redirectUrl = null;
           result = this.router.parseUrl(redirectUrl);
         } else {
+          // result = this.router.parseUrl('dashboard/af6118f0-a234-11ef-b396-bf0b38fbe686');
           result = this.router.parseUrl('home');
         }
+        //判断是否有默认dashboard，并且是租户管理员或客户用户
         if (authState.authUser.authority === Authority.TENANT_ADMIN || authState.authUser.authority === Authority.CUSTOMER_USER) {
           if (this.userHasDefaultDashboard(authState)) {
             const dashboardId = authState.userDetails.additionalInfo.defaultDashboardId;

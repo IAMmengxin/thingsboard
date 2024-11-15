@@ -20,8 +20,8 @@
                [disableClose]="sidenavOpened"
                (click)="sidenavClicked()"
                [mode]="sidenavMode"
-               [opened]="sidenavOpened && !forceFullscreen"
-               [style]="showLeftMenu?{display: 'none'}:{}">
+               [opened]="sidenavOpened && !forceFullscreen">
+<!--               [style]="showLeftMenu?{display: 'none'}:{}"-->
     <header class="tb-nav-header">
       <mat-toolbar color="primary" class="tb-nav-header-toolbar">
         <div fxFlex="auto" fxLayout="row">

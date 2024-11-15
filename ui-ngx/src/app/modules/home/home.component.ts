@@ -69,8 +69,8 @@ export class HomeComponent extends PageComponent implements AfterViewInit, OnIni
   hideLoadingBar = false;
 
   private destroy$ = new Subject<void>();
-  private _authority!: string;
-  protected showLeftMenu: boolean;
+  // private _authority!: string;
+  // protected showLeftMenu: boolean;
 
   constructor(protected store: Store<AppState>,
               @Inject(WINDOW) private window: Window,
@@ -79,16 +79,16 @@ export class HomeComponent extends PageComponent implements AfterViewInit, OnIni
               public breakpointObserver: BreakpointObserver,
               private router: Router) {
     super(store);
-    this.store.pipe(
-      select(selectUserDetails),
-      map(user=>{
-        this._authority=user.authority;
-        this.showLeftMenu = this._authority!==undefined&&this._authority===Authority.CUSTOMER_USER;
-        if(this.showLeftMenu){
-          this.router.navigateByUrl('dashboards').then(()=>{});
-        }
-      })
-    ).subscribe();
+    // this.store.pipe(
+    //   select(selectUserDetails),
+    //   map(user=>{
+    //     this._authority=user.authority;
+    //     this.showLeftMenu = this._authority!==undefined&&this._authority===Authority.CUSTOMER_USER;
+    //     if(!this.showLeftMenu){
+    //       this.router.navigateByUrl('dashboard/af6118f0-a234-11ef-b396-bf0b38fbe686').then(()=>{});
+    //     }
+    //   })
+    // ).subscribe();
   }
 
   ngOnInit() {
