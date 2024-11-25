@@ -24,13 +24,13 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { PageComponent } from '@shared/components/page.component';
-import { Store } from '@ngrx/store';
-import { AppState } from '@core/core.state';
-import { WidgetAction, WidgetContext } from '@home/models/widget-component.models';
-import { DatasourceData, DatasourceType, WidgetConfig, widgetType } from '@shared/models/widget.models';
-import { IWidgetSubscription, WidgetSubscriptionOptions } from '@core/api/widget-api.models';
-import { UtilsService } from '@core/services/utils.service';
+import {PageComponent} from '@shared/components/page.component';
+import {Store} from '@ngrx/store';
+import {AppState} from '@core/core.state';
+import {WidgetAction, WidgetContext} from '@home/models/widget-component.models';
+import {DatasourceData, DatasourceType, WidgetConfig, widgetType} from '@shared/models/widget.models';
+import {IWidgetSubscription, WidgetSubscriptionOptions} from '@core/api/widget-api.models';
+import {UtilsService} from '@core/services/utils.service';
 import cssjs from '@core/css/css';
 import { debounceTime, distinctUntilChanged, skip, startWith, takeUntil } from 'rxjs/operators';
 import { constructTableCssString } from '@home/components/widget/lib/table-widget.models';
@@ -65,11 +65,11 @@ import {
   NodesSortFunction,
   NodeTextFunction
 } from '@home/components/widget/lib/entity/entities-hierarchy-widget.models';
-import { EntityRelationsQuery } from '@shared/models/relation.models';
-import { AliasFilterType, RelationsQueryFilter } from '@shared/models/alias.models';
-import { EntityFilter } from '@shared/models/query/query.models';
-import { FormBuilder } from '@angular/forms';
-import { Subject } from 'rxjs';
+import {EntityRelationsQuery} from '@shared/models/relation.models';
+import {AliasFilterType, RelationsQueryFilter} from '@shared/models/alias.models';
+import {EntityFilter} from '@shared/models/query/query.models';
+import {FormBuilder} from '@angular/forms';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'tb-entities-hierarchy-widget',
@@ -80,6 +80,8 @@ export class EntitiesHierarchyWidgetComponent extends PageComponent implements O
 
   @Input()
   ctx: WidgetContext;
+  @Input()
+  sortData: { [name: string]: number }
 
   @ViewChild('searchInput') searchInputField: ElementRef;
 
@@ -95,8 +97,8 @@ export class EntitiesHierarchyWidgetComponent extends PageComponent implements O
   private subscription: IWidgetSubscription;
   private datasources: Array<HierarchyNodeDatasource>;
 
-  private nodesMap: {[nodeId: string]: HierarchyNavTreeNode} = {};
-  private pendingUpdateNodeTasks: {[nodeId: string]: () => void} = {};
+  private nodesMap: { [nodeId: string]: HierarchyNavTreeNode } = {};
+  private pendingUpdateNodeTasks: { [nodeId: string]: () => void } = {};
   private nodeIdCounter = 0;
 
   private nodeRelationQueryFunction: NodeRelationQueryFunction;
@@ -272,6 +274,8 @@ export class EntitiesHierarchyWidgetComponent extends PageComponent implements O
     if (node.id === '#') {
       const childNodes: HierarchyNavTreeNode[] = [];
       let dataIndex = 0;
+      this.datasources.sort((a, b) => parseInt(a
+        .nodeId) - parseInt(b.nodeId))
       this.datasources.forEach((childDatasource, index) => {
         const datasourceData = this.subscription.data.slice(dataIndex);
         childNodes.push(this.datasourceToNode(childDatasource as HierarchyNodeDatasource, datasourceData));
@@ -310,7 +314,7 @@ export class EntitiesHierarchyWidgetComponent extends PageComponent implements O
         const descriptors = this.ctx.actionsApi.getActionDescriptors('nodeSelected');
         if (descriptors.length) {
           const entity = selectedNode.data.nodeCtx.entity;
-          this.ctx.actionsApi.handleWidgetAction(event, descriptors[0], entity.id, entity.name,{ nodeCtx: selectedNode.data.nodeCtx }, entity.label);
+          this.ctx.actionsApi.handleWidgetAction(event, descriptors[0], entity.id, entity.name, {nodeCtx: selectedNode.data.nodeCtx}, entity.label);
         }
       }
     }
@@ -360,8 +364,28 @@ export class EntitiesHierarchyWidgetComponent extends PageComponent implements O
 
   private prepareNodes(nodes: HierarchyNavTreeNode[]): HierarchyNavTreeNode[] {
     nodes = nodes.filter((node) => node !== null);
-    nodes.sort((node1, node2) => this.nodesSortFunction(this.ctx, node1.data.nodeCtx, node2.data.nodeCtx));
+    const sortData: { [name: string]: number } = this.sortData;
+    if (sortData !== undefined) {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const index = sortData[node.data.datasource.entityName];
+        if (index !== undefined) {
+          if (index !== i) {
+            this.changeNode(nodes, i, index);
+            i--;
+          }
+        }
+      }
+    } else {
+      nodes.sort((node1, node2) => this.nodesSortFunction(this.ctx, node1.data.nodeCtx, node2.data.nodeCtx));
+    }
     return nodes;
+  }
+
+  private changeNode(nodes: HierarchyNavTreeNode[], aIndex: number, bIndex: number) {
+    let tempNode = nodes[aIndex];
+    nodes[aIndex] = nodes[bIndex];
+    nodes[bIndex] = tempNode;
   }
 
   private prepareNodeText(node: HierarchyNavTreeNode): string {
