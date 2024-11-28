@@ -19,7 +19,7 @@
 <html lang="en" style="width: 100%; height: 100%;">
 <head>
   <meta charset="utf-8">
-  <title>LoongCord IoT</title>
+  <title>LoongCore IoT</title>
   <base href="/">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,11 +28,18 @@
   <link rel="preload" href="assets/fonts/MaterialIconsRound-Regular.otf" as="font" type="font/otf" crossorigin="anonymous" />
   <link rel="stylesheet" href="assets/fonts/material-icons.css" />
   <style type="text/css">
-
+    .bgn-img{
+       background-image: url(/assets/login1.png);
+       background-repeat: no-repeat;
+       width: 100vw;
+       height: 100vh;
+       background-size: 100% 100%;
+    }
     body, html {
       height: 100%;
       overflow: hidden;
-      background-color: #eee;
+      /* background-color: red; */
+
     }
 
     .tb-loading-spinner {
@@ -97,7 +104,7 @@
 
   </style>
 </head>
-<body class="tb-default">
+<body class="tb-default bgn-img">
   <tb-root></tb-root>
   <div id="tb-loading-spinner" class="tb-loading-spinner">
     <div class="tb-bounce1"></div>
